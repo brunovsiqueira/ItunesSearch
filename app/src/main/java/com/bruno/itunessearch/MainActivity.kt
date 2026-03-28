@@ -6,7 +6,9 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Surface
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Modifier
+import com.bruno.itunessearch.di.LocalAppContainer
 import com.bruno.itunessearch.ui.theme.ItunesSearchTheme
 
 class MainActivity : ComponentActivity() {
@@ -14,9 +16,12 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            ItunesSearchTheme {
-                Surface(modifier = Modifier.fillMaxSize()) {
-                    AppNavHost()
+            val container = (application as App).container
+            CompositionLocalProvider(LocalAppContainer provides container) {
+                ItunesSearchTheme {
+                    Surface(modifier = Modifier.fillMaxSize()) {
+                        AppNavHost()
+                    }
                 }
             }
         }

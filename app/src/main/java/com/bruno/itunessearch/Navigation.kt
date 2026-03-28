@@ -11,6 +11,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
+import com.bruno.itunessearch.ui.home.HomeScreen
 import kotlinx.serialization.Serializable
 
 // Type-safe navigation routes
@@ -29,19 +30,25 @@ fun AppNavHost(modifier: Modifier = Modifier) {
         modifier = modifier,
     ) {
         composable<HomeRoute> {
-            // TODO: Batch 2 — HomeScreen
-            PlaceholderScreen("Home")
+            HomeScreen(
+                onNavigateToPlayer = { trackId ->
+                    navController.navigate(PlayerRoute(trackId))
+                },
+                onNavigateToAlbum = { collectionId ->
+                    navController.navigate(AlbumRoute(collectionId))
+                },
+            )
         }
 
         composable<PlayerRoute> { backStackEntry ->
             val route = backStackEntry.toRoute<PlayerRoute>()
-            // TODO: Batch 3 — PlayerScreen(trackId = route.trackId)
+            // TODO: Batch 3 — PlayerScreen
             PlaceholderScreen("Player: ${route.trackId}")
         }
 
         composable<AlbumRoute> { backStackEntry ->
             val route = backStackEntry.toRoute<AlbumRoute>()
-            // TODO: Batch 4 — AlbumScreen(collectionId = route.collectionId)
+            // TODO: Batch 4 — AlbumScreen
             PlaceholderScreen("Album: ${route.collectionId}")
         }
     }
