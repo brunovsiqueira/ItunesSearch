@@ -30,7 +30,6 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.bruno.itunessearch.R
 import com.bruno.itunessearch.di.LocalAppContainer
 import com.bruno.itunessearch.domain.model.Song
-import com.bruno.itunessearch.player.AudioPlayer
 import com.bruno.itunessearch.ui.components.AlbumArtwork
 import com.bruno.itunessearch.ui.components.CircleIconButton
 import com.bruno.itunessearch.ui.components.PlayerControls
@@ -48,7 +47,7 @@ fun PlayerScreen(
         PlayerViewModel(
             trackId = trackId,
             songRepository = container.songRepository,
-            audioPlayer = AudioPlayer(container.applicationContext),
+            audioPlayer = container.audioPlayer,
         )
     }
     val state by viewModel.state.collectAsStateWithLifecycle()

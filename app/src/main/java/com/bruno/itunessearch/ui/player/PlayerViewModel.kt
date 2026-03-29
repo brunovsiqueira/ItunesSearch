@@ -119,9 +119,4 @@ class PlayerViewModel(
         viewModelScope.launch { songRepository.markAsPlayed(song.trackId) }
         song.previewUrl?.let { audioPlayer.play(it) }
     }
-
-    override fun onCleared() {
-        super.onCleared()
-        audioPlayer.release()
-    }
 }
