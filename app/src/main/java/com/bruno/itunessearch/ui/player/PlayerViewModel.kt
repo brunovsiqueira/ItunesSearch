@@ -46,10 +46,15 @@ class PlayerViewModel(
         viewModelScope.launch {
             val song = songRepository.getSongById(trackId) ?: return@launch
             _state.update { it.copy(currentSong = song) }
-            nowPlaying.setSong(song)
-
-            // Mark as played and start playback
             songRepository.markAsPlayed(trackId)
+
+            // If this song is already the current one, just sync state — don't restart playback
+            if (nowPlaying.currentSong.value?.trackId == trackId) {
+                nowPlaying.setSong(song)
+                return@launch
+            }
+
+            nowPlaying.setSong(song)
             if (song.previewUrl != null) {
                 audioPlayer.play(song.previewUrl)
             } else {
