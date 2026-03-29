@@ -21,7 +21,10 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
+import androidx.activity.compose.BackHandler
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -72,6 +75,14 @@ private fun HomeContent(
     modifier: Modifier = Modifier,
 ) {
     val snackbarHostState = remember { SnackbarHostState() }
+    val keyboardController = LocalSoftwareKeyboardController.current
+    val focusManager = LocalFocusManager.current
+
+    // Back dismisses keyboard first, then default system back
+    BackHandler(enabled = state.searchQuery.isNotBlank()) {
+        keyboardController?.hide()
+        focusManager.clearFocus()
+    }
 
     val errorMessage = state.error?.let { stringResource(it.toStringRes()) }
     LaunchedEffect(errorMessage) {
