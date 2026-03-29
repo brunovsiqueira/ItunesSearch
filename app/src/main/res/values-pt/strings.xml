@@ -6,6 +6,7 @@
     <string name="search_hint">Buscar</string>
 
     <!-- Player -->
+    <string name="now_playing">Reproduzindo</string>
     <string name="play">Reproduzir</string>
     <string name="pause">Pausar</string>
     <string name="next_track">Próxima faixa</string>

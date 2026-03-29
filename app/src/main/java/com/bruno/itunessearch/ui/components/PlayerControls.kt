@@ -10,9 +10,6 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Pause
 import androidx.compose.material.icons.filled.PlayArrow
-import androidx.compose.material.icons.filled.Repeat
-import androidx.compose.material.icons.filled.SkipNext
-import androidx.compose.material.icons.filled.SkipPrevious
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -20,6 +17,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.bruno.itunessearch.R
@@ -39,7 +38,7 @@ fun PlayerControls(
         modifier = modifier.fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        // Play/Pause — large circle, left-aligned per Android Figma
+        // Play/Pause — large circle
         IconButton(
             onClick = onPlayPause,
             modifier = Modifier
@@ -59,44 +58,40 @@ fun PlayerControls(
 
         Spacer(modifier = Modifier.width(16.dp))
 
-        // Previous
+        // Previous — custom Figma icon
         IconButton(
             onClick = onPrevious,
             enabled = hasPrevious,
         ) {
             Icon(
-                imageVector = Icons.Default.SkipPrevious,
+                painter = painterResource(R.drawable.ic_skip_previous),
                 contentDescription = stringResource(R.string.previous_track),
-                tint = MaterialTheme.colorScheme.onSurface.copy(
-                    alpha = if (hasPrevious) 1f else 0.4f
-                ),
-                modifier = Modifier.size(28.dp),
+                tint = Color.White.copy(alpha = if (hasPrevious) 1f else 0.4f),
+                modifier = Modifier.size(36.dp),
             )
         }
 
-        // Next
+        // Next — custom Figma icon
         IconButton(
             onClick = onNext,
             enabled = hasNext,
         ) {
             Icon(
-                imageVector = Icons.Default.SkipNext,
+                painter = painterResource(R.drawable.ic_skip_next),
                 contentDescription = stringResource(R.string.next_track),
-                tint = MaterialTheme.colorScheme.onSurface.copy(
-                    alpha = if (hasNext) 1f else 0.4f
-                ),
-                modifier = Modifier.size(28.dp),
+                tint = Color.White.copy(alpha = if (hasNext) 1f else 0.4f),
+                modifier = Modifier.size(36.dp),
             )
         }
 
         Spacer(modifier = Modifier.weight(1f))
 
-        // Repeat icon — far right
+        // Repeat — custom Figma icon (22dp per design)
         Icon(
-            imageVector = Icons.Default.Repeat,
+            painter = painterResource(R.drawable.ic_repeat),
             contentDescription = stringResource(R.string.repeat),
-            tint = MaterialTheme.colorScheme.onSurfaceVariant,
-            modifier = Modifier.size(24.dp),
+            tint = Color.White,
+            modifier = Modifier.size(22.dp),
         )
     }
 }
