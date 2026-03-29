@@ -12,6 +12,7 @@ data class HomeState(
     val isLoading: Boolean = false,
     val error: UiError? = null,
     val isRefreshing: Boolean = false,
+    val hasSearched: Boolean = false,
 ) {
     /**
      * What to show in the song list:
@@ -29,8 +30,16 @@ data class HomeState(
     val isShowingRecentlyPlayed: Boolean
         get() = searchQuery.isBlank() && recentlyPlayed.isNotEmpty()
 
+    /**
+     * Show empty state only when:
+     * - Not loading
+     * - No error
+     * - No songs to display
+     * - AND either: no active search (show "Search for songs"), or search completed with no results
+     */
     val showEmptyState: Boolean
-        get() = !isLoading && displayedSongs.isEmpty() && error == null
+        get() = !isLoading && displayedSongs.isEmpty() && error == null &&
+            (searchQuery.isBlank() || hasSearched)
 }
 
 sealed interface HomeEvent {

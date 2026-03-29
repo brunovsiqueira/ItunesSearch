@@ -33,7 +33,7 @@ class HomeViewModel(
     fun onEvent(event: HomeEvent) {
         when (event) {
             is HomeEvent.SearchQueryChanged -> {
-                _state.update { it.copy(searchQuery = event.query) }
+                _state.update { it.copy(searchQuery = event.query, hasSearched = false) }
                 searchQueryFlow.value = event.query
             }
             is HomeEvent.SongClicked -> { /* handled by screen via navigation callback */ }
@@ -83,8 +83,8 @@ class HomeViewModel(
     private suspend fun search(query: String) {
         _state.update { it.copy(isLoading = true, error = null) }
         when (val result = songRepository.fetchSearchResults(query)) {
-            is Result.Success -> _state.update { it.copy(isLoading = false) }
-            is Result.Failure -> _state.update { it.copy(isLoading = false, error = result.toUiError()) }
+            is Result.Success -> _state.update { it.copy(isLoading = false, hasSearched = true) }
+            is Result.Failure -> _state.update { it.copy(isLoading = false, hasSearched = true, error = result.toUiError()) }
         }
     }
 

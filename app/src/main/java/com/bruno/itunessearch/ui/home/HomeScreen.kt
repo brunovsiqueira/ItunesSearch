@@ -78,7 +78,7 @@ private fun HomeContent(
 ) {
     val listState = rememberLazyListState()
     val snackbarHostState = remember { SnackbarHostState() }
-    val context = LocalContext.current
+    val resources = LocalContext.current.resources
 
     // Collapse header when scrolled past first item
     val collapsed by remember {
@@ -87,10 +87,11 @@ private fun HomeContent(
         }
     }
 
-    // Show error as snackbar — UI layer resolves domain error → string resource
+    // Show error as snackbar — resolve string before entering coroutine
     LaunchedEffect(state.error) {
         state.error?.let { failure ->
-            snackbarHostState.showSnackbar(message = context.getString(failure.toStringRes()))
+            val message = resources.getString(failure.toStringRes())
+            snackbarHostState.showSnackbar(message = message)
             onEvent(HomeEvent.ErrorDismissed)
         }
     }
