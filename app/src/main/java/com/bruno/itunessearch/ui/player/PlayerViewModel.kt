@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.bruno.itunessearch.domain.model.Song
 import com.bruno.itunessearch.domain.repository.SongRepository
 import com.bruno.itunessearch.player.AudioPlayer
+import com.bruno.itunessearch.player.NowPlayingState
 import com.bruno.itunessearch.ui.UiError
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -17,6 +18,7 @@ class PlayerViewModel(
     private val trackId: Long,
     private val songRepository: SongRepository,
     private val audioPlayer: AudioPlayer,
+    private val nowPlaying: NowPlayingState,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(PlayerState())
@@ -44,6 +46,7 @@ class PlayerViewModel(
         viewModelScope.launch {
             val song = songRepository.getSongById(trackId) ?: return@launch
             _state.update { it.copy(currentSong = song) }
+            nowPlaying.setSong(song)
 
             // Mark as played and start playback
             songRepository.markAsPlayed(trackId)
@@ -116,6 +119,7 @@ class PlayerViewModel(
 
     private fun playSong(song: Song) {
         _state.update { it.copy(currentSong = song, positionMs = 0L) }
+        nowPlaying.setSong(song)
         viewModelScope.launch { songRepository.markAsPlayed(song.trackId) }
         song.previewUrl?.let { audioPlayer.play(it) }
     }

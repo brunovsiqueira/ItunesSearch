@@ -48,6 +48,7 @@ fun PlayerScreen(
             trackId = trackId,
             songRepository = container.songRepository,
             audioPlayer = container.audioPlayer,
+            nowPlaying = container.nowPlaying,
         )
     }
     val state by viewModel.state.collectAsStateWithLifecycle()
