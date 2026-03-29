@@ -2,6 +2,8 @@ package com.bruno.itunessearch.di
 
 import android.content.Context
 import androidx.room.Room
+import com.bruno.itunessearch.data.AndroidConnectivityObserver
+import com.bruno.itunessearch.data.ConnectivityObserver
 import com.bruno.itunessearch.data.local.AppDatabase
 import com.bruno.itunessearch.data.remote.ITunesApi
 import com.bruno.itunessearch.data.repository.AlbumRepositoryImpl
@@ -18,6 +20,9 @@ import retrofit2.Retrofit
 class AppContainer(context: Context) {
 
     val applicationContext: Context = context.applicationContext
+
+    // Connectivity
+    val connectivityObserver: ConnectivityObserver = AndroidConnectivityObserver(applicationContext)
 
     // Network
     private val json = Json { ignoreUnknownKeys = true }

@@ -22,6 +22,9 @@
     <string name="search_for_songs">Search for songs to get started</string>
     <string name="retry">Retry</string>
 
+    <!-- Connectivity -->
+    <string name="offline_banner">You are offline</string>
+
     <!-- Errors -->
     <string name="error_network">Could not connect. Check your internet connection.</string>
     <string name="error_api">Something went wrong. Please try again.</string>
