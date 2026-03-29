@@ -29,7 +29,6 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.bruno.itunessearch.R
 import com.bruno.itunessearch.di.LocalAppContainer
-import com.bruno.itunessearch.domain.model.Song
 import com.bruno.itunessearch.ui.components.AlbumArtwork
 import com.bruno.itunessearch.ui.components.CircleIconButton
 import com.bruno.itunessearch.ui.components.SongListItem
@@ -53,7 +52,11 @@ fun AlbumScreen(
     AlbumContent(
         state = state,
         onBack = onBack,
-        onTrackClick = onTrackClick,
+        onTrackClick = { trackId ->
+            // Set playlist context: album tracks
+            container.nowPlaying.setPlaylist(state.tracks)
+            onTrackClick(trackId)
+        },
         modifier = modifier,
     )
 }

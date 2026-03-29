@@ -126,7 +126,7 @@ class PlayerViewModelTest {
         val songs = TestData.sampleSongs
         val firstSong = songs[0]
         repository.songById = firstSong
-        repository.emitSearchResults(songs) // playlist comes from album stream
+        nowPlaying.setPlaylist(songs) // playlist set by launching screen
 
         val viewModel = createViewModel(trackId = firstSong.trackId)
         testDispatcher.scheduler.advanceUntilIdle()
@@ -143,7 +143,7 @@ class PlayerViewModelTest {
         val songs = TestData.sampleSongs
         val secondSong = songs[1]
         repository.songById = secondSong
-        repository.emitSearchResults(songs)
+        nowPlaying.setPlaylist(songs) // playlist set by launching screen
 
         val viewModel = createViewModel(trackId = secondSong.trackId)
         testDispatcher.scheduler.advanceUntilIdle()

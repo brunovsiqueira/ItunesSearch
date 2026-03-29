@@ -62,11 +62,10 @@ class PlayerViewModel(
             }
         }
 
-        // Load playlist from same album for next/prev navigation
+        // Playlist comes from the launching screen (Home or Album) via NowPlayingState
         viewModelScope.launch {
-            val song = songRepository.getSongById(trackId) ?: return@launch
-            songRepository.getSongsByAlbumStream(song.collectionId).collectLatest { songs ->
-                _state.update { it.copy(playlist = songs) }
+            nowPlaying.playlist.collectLatest { playlist ->
+                _state.update { it.copy(playlist = playlist) }
             }
         }
     }

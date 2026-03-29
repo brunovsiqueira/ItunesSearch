@@ -28,7 +28,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -49,7 +48,6 @@ import com.bruno.itunessearch.ui.toStringRes
 @Composable
 fun HomeScreen(
     onNavigateToPlayer: (trackId: Long) -> Unit,
-    onNavigateToAlbum: (collectionId: Long) -> Unit,
     onShowBottomSheet: (Song) -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -62,7 +60,11 @@ fun HomeScreen(
     HomeContent(
         state = state,
         onEvent = viewModel::onEvent,
-        onSongClick = { song -> onNavigateToPlayer(song.trackId) },
+        onSongClick = { song ->
+            // Set playlist context: whatever list the user is looking at
+            container.nowPlaying.setPlaylist(state.displayedSongs)
+            onNavigateToPlayer(song.trackId)
+        },
         onMoreClick = onShowBottomSheet,
         modifier = modifier,
     )
@@ -83,17 +85,16 @@ private fun HomeContent(
 ) {
     val listState = rememberLazyListState()
     val snackbarHostState = remember { SnackbarHostState() }
-    val resources = LocalContext.current.resources
 
     val collapsed by remember {
         derivedStateOf { listState.firstVisibleItemIndex > 0 }
     }
 
-    // Show error as snackbar when there ARE cached songs to display underneath
-    LaunchedEffect(state.error) {
-        if (state.error != null && state.displayedSongs.isNotEmpty()) {
-            val message = resources.getString(state.error.toStringRes())
-            snackbarHostState.showSnackbar(message = message)
+    // Resolve error message in composable scope, then show as snackbar
+    val errorMessage = state.error?.let { stringResource(it.toStringRes()) }
+    LaunchedEffect(errorMessage) {
+        if (errorMessage != null && state.displayedSongs.isNotEmpty()) {
+            snackbarHostState.showSnackbar(message = errorMessage)
             onEvent(HomeEvent.ErrorDismissed)
         }
     }
