@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -28,8 +29,9 @@ import androidx.compose.ui.unit.dp
 import com.bruno.itunessearch.R
 import com.bruno.itunessearch.domain.model.Song
 
-// Figma: #262626 at 80% opacity
-private val SheetBackground = Color(0xCC262626)
+// Figma specifies #262626 at 80% with blur 50.
+// Since Compose blur requires API 31+, we use higher opacity as fallback for clean look.
+private val SheetBackground = Color(0xF2262626)
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -52,7 +54,8 @@ fun SongBottomSheet(
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(bottom = 32.dp),
+                .navigationBarsPadding()
+                .padding(bottom = 24.dp, top = 8.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             // Song info

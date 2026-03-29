@@ -68,9 +68,6 @@ fun AppNavHost(modifier: Modifier = Modifier) {
                     onNavigateToPlayer = { trackId ->
                         navController.navigate(PlayerRoute(trackId))
                     },
-                    onNavigateToAlbum = { collectionId ->
-                        navController.navigate(AlbumRoute(collectionId))
-                    },
                     onShowBottomSheet = { song -> bottomSheetSong = song },
                 )
             }
@@ -110,11 +107,12 @@ fun AppNavHost(modifier: Modifier = Modifier) {
 
     // Bottom sheet — rendered above everything
     bottomSheetSong?.let { song ->
+        fun dismissSheet() {}
         SongBottomSheet(
             song = song,
-            onDismiss = { bottomSheetSong = null },
+            onDismiss = ::dismissSheet,
             onViewAlbum = {
-                bottomSheetSong = null
+                dismissSheet()
                 navController.navigate(AlbumRoute(song.collectionId))
             },
         )
