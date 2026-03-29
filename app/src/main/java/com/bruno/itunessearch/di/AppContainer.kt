@@ -11,6 +11,7 @@ import com.bruno.itunessearch.data.repository.SongRepositoryImpl
 import com.bruno.itunessearch.domain.repository.AlbumRepository
 import com.bruno.itunessearch.domain.repository.SongRepository
 import com.bruno.itunessearch.player.AudioPlayer
+import com.bruno.itunessearch.player.ExoAudioPlayer
 import com.bruno.itunessearch.player.NowPlayingState
 import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
 import kotlinx.serialization.json.Json
@@ -27,7 +28,7 @@ class AppContainer(context: Context) {
     val connectivityObserver: ConnectivityObserver = AndroidConnectivityObserver(applicationContext)
 
     // Audio — singletons, shared across all screens
-    val audioPlayer: AudioPlayer = AudioPlayer(applicationContext)
+    val audioPlayer: AudioPlayer = ExoAudioPlayer(applicationContext)
     val nowPlaying: NowPlayingState = NowPlayingState()
 
     // Network

@@ -1,13 +1,16 @@
 package com.bruno.itunessearch.ui.components
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Pause
 import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.material.icons.filled.Repeat
 import androidx.compose.material.icons.filled.SkipNext
 import androidx.compose.material.icons.filled.SkipPrevious
 import androidx.compose.material3.Icon
@@ -33,24 +36,10 @@ fun PlayerControls(
     modifier: Modifier = Modifier,
 ) {
     Row(
-        modifier = modifier,
-        horizontalArrangement = Arrangement.spacedBy(32.dp),
+        modifier = modifier.fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        IconButton(
-            onClick = onPrevious,
-            enabled = hasPrevious,
-        ) {
-            Icon(
-                imageVector = Icons.Default.SkipPrevious,
-                contentDescription = stringResource(R.string.previous_track),
-                tint = MaterialTheme.colorScheme.onSurface.copy(
-                    alpha = if (hasPrevious) 1f else 0.4f
-                ),
-                modifier = Modifier.size(32.dp),
-            )
-        }
-
+        // Play/Pause — large circle, left-aligned per Android Figma
         IconButton(
             onClick = onPlayPause,
             modifier = Modifier
@@ -68,6 +57,24 @@ fun PlayerControls(
             )
         }
 
+        Spacer(modifier = Modifier.width(16.dp))
+
+        // Previous
+        IconButton(
+            onClick = onPrevious,
+            enabled = hasPrevious,
+        ) {
+            Icon(
+                imageVector = Icons.Default.SkipPrevious,
+                contentDescription = stringResource(R.string.previous_track),
+                tint = MaterialTheme.colorScheme.onSurface.copy(
+                    alpha = if (hasPrevious) 1f else 0.4f
+                ),
+                modifier = Modifier.size(28.dp),
+            )
+        }
+
+        // Next
         IconButton(
             onClick = onNext,
             enabled = hasNext,
@@ -78,8 +85,18 @@ fun PlayerControls(
                 tint = MaterialTheme.colorScheme.onSurface.copy(
                     alpha = if (hasNext) 1f else 0.4f
                 ),
-                modifier = Modifier.size(32.dp),
+                modifier = Modifier.size(28.dp),
             )
         }
+
+        Spacer(modifier = Modifier.weight(1f))
+
+        // Repeat icon — far right
+        Icon(
+            imageVector = Icons.Default.Repeat,
+            contentDescription = stringResource(R.string.repeat),
+            tint = MaterialTheme.colorScheme.onSurfaceVariant,
+            modifier = Modifier.size(24.dp),
+        )
     }
 }

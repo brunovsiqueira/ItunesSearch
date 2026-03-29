@@ -1,15 +1,16 @@
 package com.bruno.itunessearch.ui.components
 
+import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.gestures.detectHorizontalDragGestures
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.Canvas
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Slider
-import androidx.compose.material3.SliderDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -19,14 +20,18 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.foundation.layout.size
-import androidx.compose.ui.draw.clip
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.unit.dp
 import com.bruno.itunessearch.ui.theme.SeekBarProgress
 import com.bruno.itunessearch.ui.theme.SeekBarTrack
 import java.util.Locale
 
-@OptIn(ExperimentalMaterial3Api::class)
+/**
+ * Custom seek bar matching Figma: thin track (3dp), small circle thumb (10dp).
+ * Drawn manually via Canvas for pixel-perfect control over track height and thumb size.
+ */
 @Composable
 fun SeekBar(
     positionMs: Long,
@@ -34,11 +39,9 @@ fun SeekBar(
     onSeek: (Long) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    // Single source of truth for slider position (0f..1f)
     var sliderValue by remember { mutableFloatStateOf(0f) }
     var isUserDragging by remember { mutableStateOf(false) }
 
-    // Sync slider from player position — only when user is NOT dragging
     LaunchedEffect(positionMs, durationMs) {
         if (!isUserDragging && durationMs > 0) {
             sliderValue = positionMs.toFloat() / durationMs.toFloat()
@@ -49,36 +52,71 @@ fun SeekBar(
     val remainingMs = durationMs - elapsedMs
 
     Column(modifier = modifier.fillMaxWidth()) {
-        Slider(
-            value = sliderValue,
-            onValueChange = { value ->
-                isUserDragging = true
-                sliderValue = value
-            },
-            onValueChangeFinished = {
-                onSeek((sliderValue * durationMs).toLong())
-                isUserDragging = false
-            },
-            colors = SliderDefaults.colors(
-                thumbColor = SeekBarProgress,
-                activeTrackColor = SeekBarProgress,
-                inactiveTrackColor = SeekBarTrack,
-            ),
-            thumb = {
-                // Small circle thumb matching Figma (default is too large)
-                Canvas(
-                    modifier = Modifier
-                        .size(12.dp)
-                        .clip(CircleShape),
-                ) {
-                    drawCircle(color = SeekBarProgress)
+        Canvas(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(24.dp) // touch target height
+                .pointerInput(durationMs) {
+                    detectTapGestures { offset ->
+                        val fraction = (offset.x / size.width).coerceIn(0f, 1f)
+                        sliderValue = fraction
+                        onSeek((fraction * durationMs).toLong())
+                    }
                 }
-            },
-            modifier = Modifier.fillMaxWidth(),
-        )
+                .pointerInput(durationMs) {
+                    detectHorizontalDragGestures(
+                        onDragStart = { isUserDragging = true },
+                        onDragEnd = {
+                            isUserDragging = false
+                            onSeek((sliderValue * durationMs).toLong())
+                        },
+                        onDragCancel = { isUserDragging = false },
+                        onHorizontalDrag = { _, dragAmount ->
+                            val delta = dragAmount / size.width
+                            sliderValue = (sliderValue + delta).coerceIn(0f, 1f)
+                        },
+                    )
+                },
+        ) {
+            val trackY = size.height / 2
+            val trackHeight = 3.dp.toPx()
+            val thumbRadius = 5.dp.toPx()
+            val thumbX = sliderValue * size.width
+
+            // Inactive track (full width)
+            drawLine(
+                color = SeekBarTrack,
+                start = Offset(0f, trackY),
+                end = Offset(size.width, trackY),
+                strokeWidth = trackHeight,
+                cap = StrokeCap.Round,
+            )
+
+            // Active track (up to thumb)
+            if (thumbX > 0) {
+                drawLine(
+                    color = SeekBarProgress,
+                    start = Offset(0f, trackY),
+                    end = Offset(thumbX, trackY),
+                    strokeWidth = trackHeight,
+                    cap = StrokeCap.Round,
+                )
+            }
+
+            // Thumb circle
+            drawCircle(
+                color = SeekBarProgress,
+                radius = thumbRadius,
+                center = Offset(thumbX.coerceIn(thumbRadius, size.width - thumbRadius), trackY),
+            )
+        }
+
+        Spacer(modifier = Modifier.height(4.dp))
 
         Row(
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 2.dp),
             horizontalArrangement = Arrangement.SpaceBetween,
         ) {
             Text(

@@ -5,13 +5,13 @@ import androidx.annotation.OptIn
 import androidx.media3.common.MediaItem
 import androidx.media3.common.PlaybackException
 import androidx.media3.common.Player
+import androidx.media3.common.util.UnstableApi
 import androidx.media3.database.StandaloneDatabaseProvider
 import androidx.media3.datasource.DefaultHttpDataSource
 import androidx.media3.datasource.cache.CacheDataSource
 import androidx.media3.datasource.cache.LeastRecentlyUsedCacheEvictor
 import androidx.media3.datasource.cache.SimpleCache
 import androidx.media3.exoplayer.ExoPlayer
-import androidx.media3.common.util.UnstableApi
 import androidx.media3.exoplayer.source.DefaultMediaSourceFactory
 import com.bruno.itunessearch.domain.AppLogger
 import kotlinx.coroutines.delay
@@ -24,12 +24,29 @@ import kotlinx.coroutines.flow.update
 import java.io.File
 
 /**
- * Wraps Media3 ExoPlayer with disk caching for offline playback.
- * Previews (~1MB each) are cached on disk via Media3's SimpleCache.
- * Once a song has been played online, it can be replayed offline.
+ * Abstraction over audio playback. Exposes reactive state via Flows.
+ * Concrete implementation uses Media3 ExoPlayer. Tests use a fake.
+ */
+interface AudioPlayer {
+    val isPlaying: StateFlow<Boolean>
+    val duration: StateFlow<Long>
+    val hasError: StateFlow<Boolean>
+    val positionFlow: Flow<Long>
+
+    fun play(url: String)
+    fun resume()
+    fun pause()
+    fun seekTo(positionMs: Long)
+    fun release()
+    fun clearError()
+}
+
+/**
+ * Media3 ExoPlayer implementation with disk caching for offline playback.
+ * Previews (~1MB each) are cached via SimpleCache (LRU, 50MB).
  */
 @OptIn(UnstableApi::class)
-class AudioPlayer(context: Context) {
+class ExoAudioPlayer(context: Context) : AudioPlayer {
 
     private val cache = getOrCreateCache(context)
 
@@ -42,15 +59,15 @@ class AudioPlayer(context: Context) {
         .build()
 
     private val _isPlaying = MutableStateFlow(false)
-    val isPlaying: StateFlow<Boolean> = _isPlaying.asStateFlow()
+    override val isPlaying: StateFlow<Boolean> = _isPlaying.asStateFlow()
 
     private val _duration = MutableStateFlow(0L)
-    val duration: StateFlow<Long> = _duration.asStateFlow()
+    override val duration: StateFlow<Long> = _duration.asStateFlow()
 
     private val _hasError = MutableStateFlow(false)
-    val hasError: StateFlow<Boolean> = _hasError.asStateFlow()
+    override val hasError: StateFlow<Boolean> = _hasError.asStateFlow()
 
-    val positionFlow: Flow<Long> = flow {
+    override val positionFlow: Flow<Long> = flow {
         while (true) {
             emit(exoPlayer.currentPosition)
             delay(POSITION_UPDATE_INTERVAL_MS)
@@ -77,7 +94,7 @@ class AudioPlayer(context: Context) {
         })
     }
 
-    fun play(url: String) {
+    override fun play(url: String) {
         runCatching {
             _hasError.update { false }
             exoPlayer.setMediaItem(MediaItem.fromUri(url))
@@ -89,27 +106,27 @@ class AudioPlayer(context: Context) {
         }
     }
 
-    fun resume() {
+    override fun resume() {
         runCatching { exoPlayer.play() }
             .onFailure { e -> AppLogger.error(TAG, "Failed to resume", e) }
     }
 
-    fun pause() {
+    override fun pause() {
         runCatching { exoPlayer.pause() }
             .onFailure { e -> AppLogger.error(TAG, "Failed to pause", e) }
     }
 
-    fun seekTo(positionMs: Long) {
+    override fun seekTo(positionMs: Long) {
         runCatching { exoPlayer.seekTo(positionMs) }
             .onFailure { e -> AppLogger.error(TAG, "Failed to seek", e) }
     }
 
-    fun release() {
+    override fun release() {
         runCatching { exoPlayer.release() }
             .onFailure { e -> AppLogger.error(TAG, "Failed to release", e) }
     }
 
-    fun clearError() {
+    override fun clearError() {
         _hasError.update { false }
     }
 
@@ -120,10 +137,6 @@ class AudioPlayer(context: Context) {
 
         private var sharedCache: SimpleCache? = null
 
-        /**
-         * SimpleCache must be a singleton — Media3 enforces one instance per directory.
-         * Shared across all AudioPlayer instances via companion object.
-         */
         @Synchronized
         private fun getOrCreateCache(context: Context): SimpleCache {
             return sharedCache ?: SimpleCache(
