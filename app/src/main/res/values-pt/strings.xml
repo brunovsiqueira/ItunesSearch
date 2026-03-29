@@ -35,4 +35,5 @@
     <string name="cd_song_artwork">Capa de %1$s por %2$s</string>
     <string name="cd_back">Voltar</string>
     <string name="cd_search">Buscar</string>
+    <string name="cd_clear_search">Limpar busca</string>
 </resources>
