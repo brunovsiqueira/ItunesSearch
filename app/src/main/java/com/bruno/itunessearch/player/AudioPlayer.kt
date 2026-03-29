@@ -1,6 +1,7 @@
 package com.bruno.itunessearch.player
 
 import android.content.Context
+import androidx.annotation.OptIn
 import androidx.media3.common.MediaItem
 import androidx.media3.common.PlaybackException
 import androidx.media3.common.Player
@@ -10,6 +11,7 @@ import androidx.media3.datasource.cache.CacheDataSource
 import androidx.media3.datasource.cache.LeastRecentlyUsedCacheEvictor
 import androidx.media3.datasource.cache.SimpleCache
 import androidx.media3.exoplayer.ExoPlayer
+import androidx.media3.common.util.UnstableApi
 import androidx.media3.exoplayer.source.DefaultMediaSourceFactory
 import com.bruno.itunessearch.domain.AppLogger
 import kotlinx.coroutines.delay
@@ -26,6 +28,7 @@ import java.io.File
  * Previews (~1MB each) are cached on disk via Media3's SimpleCache.
  * Once a song has been played online, it can be replayed offline.
  */
+@OptIn(UnstableApi::class)
 class AudioPlayer(context: Context) {
 
     private val cache = getOrCreateCache(context)
