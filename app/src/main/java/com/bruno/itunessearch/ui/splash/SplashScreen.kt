@@ -1,22 +1,21 @@
 package com.bruno.itunessearch.ui.splash
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.size
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.MusicNote
-import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import com.bruno.itunessearch.R
 import com.bruno.itunessearch.ui.theme.Black
 import com.bruno.itunessearch.ui.theme.SplashGradientCenter
 import com.bruno.itunessearch.ui.theme.SplashGradientMid
-import com.bruno.itunessearch.ui.theme.SplashIconTint
 import kotlinx.coroutines.delay
 
 private val SplashGradient = Brush.radialGradient(
@@ -39,11 +38,10 @@ fun SplashScreen(
             .background(SplashGradient),
         contentAlignment = Alignment.Center,
     ) {
-        Icon(
-            imageVector = Icons.Default.MusicNote,
+        Image(
+            painter = painterResource(R.drawable.ic_splash_music_note),
             contentDescription = null,
-            tint = SplashIconTint,
-            modifier = Modifier.size(64.dp),
+            modifier = Modifier.size(100.dp),
         )
     }
 }
