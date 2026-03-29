@@ -45,6 +45,7 @@ import com.bruno.itunessearch.ui.toStringRes
 fun HomeScreen(
     onNavigateToPlayer: (trackId: Long) -> Unit,
     onNavigateToAlbum: (collectionId: Long) -> Unit,
+    onShowBottomSheet: (Song) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val container = LocalAppContainer.current
@@ -57,7 +58,7 @@ fun HomeScreen(
         state = state,
         onEvent = viewModel::onEvent,
         onSongClick = { song -> onNavigateToPlayer(song.trackId) },
-        onMoreClick = { /* TODO: Batch 4 — bottom sheet → onNavigateToAlbum */ },
+        onMoreClick = onShowBottomSheet,
         modifier = modifier,
     )
 }

@@ -25,6 +25,14 @@ interface SongDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertAll(songs: List<SongEntity>)
 
+    /**
+     * Inserts songs only if they don't already exist (by trackId).
+     * Used by album track loading to avoid overwriting search result metadata
+     * (searchQuery, lastPlayedAt) on rows that already exist from a search.
+     */
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    suspend fun insertIfNotExists(songs: List<SongEntity>)
+
     @Query("UPDATE songs SET lastPlayedAt = :timestamp WHERE trackId = :trackId")
     suspend fun updateLastPlayed(trackId: Long, timestamp: Long = System.currentTimeMillis())
 

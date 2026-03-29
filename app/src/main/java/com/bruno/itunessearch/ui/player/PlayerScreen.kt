@@ -28,6 +28,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.bruno.itunessearch.R
 import com.bruno.itunessearch.di.LocalAppContainer
+import com.bruno.itunessearch.domain.model.Song
 import com.bruno.itunessearch.player.AudioPlayer
 import com.bruno.itunessearch.ui.components.AlbumArtwork
 import com.bruno.itunessearch.ui.components.CircleIconButton
@@ -38,7 +39,7 @@ import com.bruno.itunessearch.ui.components.SeekBar
 fun PlayerScreen(
     trackId: Long,
     onBack: () -> Unit,
-    onMoreClick: () -> Unit,
+    onMoreClick: (Song) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val container = LocalAppContainer.current
@@ -55,7 +56,7 @@ fun PlayerScreen(
         state = state,
         onEvent = viewModel::onEvent,
         onBack = onBack,
-        onMoreClick = onMoreClick,
+        onMoreClick = { state.currentSong?.let(onMoreClick) },
         modifier = modifier,
     )
 }
