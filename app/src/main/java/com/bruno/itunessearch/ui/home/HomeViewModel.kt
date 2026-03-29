@@ -39,6 +39,7 @@ class HomeViewModel(
             is HomeEvent.SongClicked -> { /* handled by screen via navigation callback */ }
             is HomeEvent.MoreClicked -> { /* handled by screen via bottom sheet callback */ }
             is HomeEvent.PullToRefresh -> refresh()
+            is HomeEvent.Retry -> retry()
             is HomeEvent.ErrorDismissed -> _state.update { it.copy(error = null) }
         }
     }
@@ -96,6 +97,12 @@ class HomeViewModel(
             songRepository.fetchSearchResults(query)
             _state.update { it.copy(isRefreshing = false) }
         }
+    }
+
+    private fun retry() {
+        val query = _state.value.searchQuery
+        if (query.isBlank()) return
+        viewModelScope.launch { search(query) }
     }
 
     companion object {

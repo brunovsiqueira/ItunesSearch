@@ -1,12 +1,15 @@
 package com.bruno.itunessearch.ui.home
 
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.CircularProgressIndicator
@@ -16,6 +19,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -32,6 +36,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.bruno.itunessearch.R
 import com.bruno.itunessearch.di.LocalAppContainer
 import com.bruno.itunessearch.domain.model.Song
+import com.bruno.itunessearch.ui.UiError
 import com.bruno.itunessearch.ui.components.CollapsingHeader
 import com.bruno.itunessearch.ui.components.SongListItem
 import com.bruno.itunessearch.ui.toStringRes
@@ -80,17 +85,14 @@ private fun HomeContent(
     val snackbarHostState = remember { SnackbarHostState() }
     val resources = LocalContext.current.resources
 
-    // Collapse header when scrolled past first item
     val collapsed by remember {
-        derivedStateOf {
-            listState.firstVisibleItemIndex > 0
-        }
+        derivedStateOf { listState.firstVisibleItemIndex > 0 }
     }
 
-    // Show error as snackbar — resolve string before entering coroutine
+    // Show error as snackbar when there ARE cached songs to display underneath
     LaunchedEffect(state.error) {
-        state.error?.let { failure ->
-            val message = resources.getString(failure.toStringRes())
+        if (state.error != null && state.displayedSongs.isNotEmpty()) {
+            val message = resources.getString(state.error.toStringRes())
             snackbarHostState.showSnackbar(message = message)
             onEvent(HomeEvent.ErrorDismissed)
         }
@@ -113,66 +115,129 @@ private fun HomeContent(
                 contentPadding = PaddingValues(bottom = 16.dp),
                 modifier = Modifier.fillMaxSize(),
             ) {
-                // Header (collapsing search bar + title)
-                item(key = "header") {
-                    Spacer(modifier = Modifier.height(8.dp))
-                    CollapsingHeader(
-                        query = state.searchQuery,
-                        onQueryChange = { onEvent(HomeEvent.SearchQueryChanged(it)) },
-                        collapsed = collapsed,
-                    )
-                    Spacer(modifier = Modifier.height(16.dp))
-                }
+                headerSection(
+                    query = state.searchQuery,
+                    onQueryChange = { onEvent(HomeEvent.SearchQueryChanged(it)) },
+                    collapsed = collapsed,
+                )
 
-                // Loading indicator
                 if (state.isLoading) {
-                    item(key = "loading") {
-                        Box(
-                            modifier = Modifier
-                                .fillParentMaxWidth()
-                                .padding(32.dp),
-                            contentAlignment = Alignment.Center,
-                        ) {
-                            CircularProgressIndicator(
-                                color = MaterialTheme.colorScheme.onSurface,
-                            )
-                        }
-                    }
+                    loadingSection()
                 }
 
-                // Empty state
-                if (state.showEmptyState) {
-                    item(key = "empty") {
-                        Box(
-                            modifier = Modifier
-                                .fillParentMaxWidth()
-                                .padding(32.dp),
-                            contentAlignment = Alignment.Center,
-                        ) {
-                            Text(
-                                text = stringResource(
-                                    if (state.searchQuery.isBlank()) R.string.search_for_songs
-                                    else R.string.no_results
-                                ),
-                                style = MaterialTheme.typography.bodyLarge,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            )
-                        }
-                    }
-                }
-
-                // Song list
-                items(
-                    items = state.displayedSongs,
-                    key = { it.trackId },
-                ) { song ->
-                    SongListItem(
-                        song = song,
-                        onSongClick = { onSongClick(song) },
-                        onMoreClick = { onMoreClick(song) },
+                if (state.error != null && state.displayedSongs.isEmpty()) {
+                    errorSection(
+                        error = state.error,
+                        onRetry = { onEvent(HomeEvent.Retry) },
                     )
                 }
+
+                if (state.showEmptyState) {
+                    emptySection(hasQuery = state.searchQuery.isNotBlank())
+                }
+
+                songListSection(
+                    songs = state.displayedSongs,
+                    onSongClick = onSongClick,
+                    onMoreClick = onMoreClick,
+                )
             }
         }
+    }
+}
+
+// -- LazyList sections --
+
+private fun LazyListScope.headerSection(
+    query: String,
+    onQueryChange: (String) -> Unit,
+    collapsed: Boolean,
+) {
+    item(key = "header") {
+        Spacer(modifier = Modifier.height(8.dp))
+        CollapsingHeader(
+            query = query,
+            onQueryChange = onQueryChange,
+            collapsed = collapsed,
+        )
+        Spacer(modifier = Modifier.height(16.dp))
+    }
+}
+
+private fun LazyListScope.loadingSection() {
+    item(key = "loading") {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(32.dp),
+            contentAlignment = Alignment.Center,
+        ) {
+            CircularProgressIndicator(
+                color = MaterialTheme.colorScheme.onSurface,
+            )
+        }
+    }
+}
+
+private fun LazyListScope.errorSection(
+    error: UiError,
+    onRetry: () -> Unit,
+) {
+    item(key = "error") {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(32.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+        ) {
+            Text(
+                text = stringResource(error.toStringRes()),
+                style = MaterialTheme.typography.bodyLarge,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+            TextButton(onClick = onRetry) {
+                Text(
+                    text = stringResource(R.string.retry),
+                    color = MaterialTheme.colorScheme.onSurface,
+                )
+            }
+        }
+    }
+}
+
+private fun LazyListScope.emptySection(hasQuery: Boolean) {
+    item(key = "empty") {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(32.dp),
+            contentAlignment = Alignment.Center,
+        ) {
+            Text(
+                text = stringResource(
+                    if (hasQuery) R.string.no_results else R.string.search_for_songs
+                ),
+                style = MaterialTheme.typography.bodyLarge,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+        }
+    }
+}
+
+private fun LazyListScope.songListSection(
+    songs: List<Song>,
+    onSongClick: (Song) -> Unit,
+    onMoreClick: (Song) -> Unit,
+) {
+    items(
+        items = songs,
+        key = { it.trackId },
+    ) { song ->
+        SongListItem(
+            song = song,
+            onSongClick = { onSongClick(song) },
+            onMoreClick = { onMoreClick(song) },
+        )
     }
 }

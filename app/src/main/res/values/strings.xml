@@ -11,6 +11,7 @@
     <string name="next_track">Next track</string>
     <string name="previous_track">Previous track</string>
     <string name="repeat">Repeat</string>
+    <string name="no_preview">Preview not available for this track</string>
 
     <!-- Bottom Sheet -->
     <string name="view_album">View album</string>
@@ -19,6 +20,7 @@
     <!-- States -->
     <string name="no_results">No results found</string>
     <string name="search_for_songs">Search for songs to get started</string>
+    <string name="retry">Retry</string>
 
     <!-- Errors -->
     <string name="error_network">Could not connect. Check your internet connection.</string>

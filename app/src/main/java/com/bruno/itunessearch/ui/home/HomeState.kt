@@ -47,5 +47,6 @@ sealed interface HomeEvent {
     data class SongClicked(val song: Song) : HomeEvent
     data class MoreClicked(val song: Song) : HomeEvent
     data object PullToRefresh : HomeEvent
+    data object Retry : HomeEvent
     data object ErrorDismissed : HomeEvent
 }

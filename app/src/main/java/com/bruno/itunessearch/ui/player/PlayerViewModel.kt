@@ -47,7 +47,11 @@ class PlayerViewModel(
 
             // Mark as played and start playback
             songRepository.markAsPlayed(trackId)
-            song.previewUrl?.let { audioPlayer.play(it) }
+            if (song.previewUrl != null) {
+                audioPlayer.play(song.previewUrl)
+            } else {
+                _state.update { it.copy(error = UiError.NoPreview) }
+            }
         }
 
         // Load playlist from same album for next/prev navigation

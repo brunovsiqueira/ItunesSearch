@@ -12,6 +12,7 @@ import com.bruno.itunessearch.domain.Result
 enum class UiError {
     Network,
     Server,
+    NoPreview,
     Unknown,
 }
 
@@ -23,6 +24,7 @@ enum class UiError {
 fun UiError.toStringRes(): Int = when (this) {
     UiError.Network -> R.string.error_network
     UiError.Server -> R.string.error_api
+    UiError.NoPreview -> R.string.no_preview
     UiError.Unknown -> R.string.error_unknown
 }
 
