@@ -12,8 +12,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -22,15 +20,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.bruno.itunessearch.R
 import com.bruno.itunessearch.di.LocalAppContainer
 import com.bruno.itunessearch.ui.components.AlbumArtwork
-import com.bruno.itunessearch.ui.components.CircleIconButton
+import com.bruno.itunessearch.ui.components.ScreenTopBar
 import com.bruno.itunessearch.ui.components.SongListItem
 
 @Composable
@@ -53,7 +49,6 @@ fun AlbumScreen(
         state = state,
         onBack = onBack,
         onTrackClick = { trackId ->
-            // Set playlist context: album tracks
             container.nowPlaying.setPlaylist(state.tracks)
             onTrackClick(trackId)
         },
@@ -77,22 +72,15 @@ private fun AlbumContent(
                 .fillMaxSize()
                 .statusBarsPadding()
                 .navigationBarsPadding(),
-            contentPadding = PaddingValues(bottom = 32.dp),
+            contentPadding = PaddingValues(bottom = 80.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-            // Back button
+            // Top bar: back + album title
             item(key = "topbar") {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp, vertical = 8.dp),
-                ) {
-                    CircleIconButton(
-                        icon = Icons.AutoMirrored.Filled.ArrowBack,
-                        contentDescription = stringResource(R.string.cd_back),
-                        onClick = onBack,
-                    )
-                }
+                ScreenTopBar(
+                    title = state.album?.collectionName.orEmpty(),
+                    onBack = onBack,
+                )
             }
 
             // Album artwork + info
@@ -101,8 +89,6 @@ private fun AlbumContent(
                     horizontalAlignment = Alignment.CenterHorizontally,
                     modifier = Modifier.padding(horizontal = 24.dp),
                 ) {
-                    Spacer(modifier = Modifier.height(16.dp))
-
                     state.album?.let { album ->
                         AlbumArtwork(
                             artworkUrl = album.artworkUrl,
@@ -127,7 +113,7 @@ private fun AlbumContent(
                         )
                     }
 
-                    Spacer(modifier = Modifier.height(24.dp))
+                    Spacer(modifier = Modifier.height(40.dp))
                 }
             }
 

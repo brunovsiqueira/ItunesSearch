@@ -1,7 +1,6 @@
 package com.bruno.itunessearch.ui.player
 
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -9,12 +8,8 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
-import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.MoreVert
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -32,6 +27,7 @@ import com.bruno.itunessearch.di.LocalAppContainer
 import com.bruno.itunessearch.domain.model.Song
 import com.bruno.itunessearch.ui.components.AlbumArtwork
 import com.bruno.itunessearch.ui.components.PlayerControls
+import com.bruno.itunessearch.ui.components.ScreenTopBar
 import com.bruno.itunessearch.ui.components.SeekBar
 
 @Composable
@@ -83,35 +79,13 @@ private fun PlayerContent(
                 .padding(horizontal = 24.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-            // Top bar: back arrow + "Now playing" + vertical more
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 8.dp),
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                IconButton(onClick = onBack) {
-                    Icon(
-                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                        contentDescription = stringResource(R.string.cd_back),
-                        tint = MaterialTheme.colorScheme.onSurface,
-                    )
-                }
-                Spacer(modifier = Modifier.width(4.dp))
-                Text(
-                    text = stringResource(R.string.now_playing),
-                    style = MaterialTheme.typography.titleMedium,
-                    color = MaterialTheme.colorScheme.onBackground,
-                )
-                Spacer(modifier = Modifier.weight(1f))
-                IconButton(onClick = onMoreClick) {
-                    Icon(
-                        imageVector = Icons.Default.MoreVert,
-                        contentDescription = stringResource(R.string.more_options),
-                        tint = MaterialTheme.colorScheme.onSurface,
-                    )
-                }
-            }
+            ScreenTopBar(
+                title = stringResource(R.string.now_playing),
+                onBack = onBack,
+                trailingIcon = Icons.Default.MoreVert,
+                onTrailingClick = onMoreClick,
+                trailingContentDescription = stringResource(R.string.more_options),
+            )
 
             Spacer(modifier = Modifier.weight(1f))
 

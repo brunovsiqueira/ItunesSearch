@@ -11,7 +11,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
@@ -23,7 +22,6 @@ import androidx.compose.material3.TextButton
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -36,15 +34,10 @@ import com.bruno.itunessearch.R
 import com.bruno.itunessearch.di.LocalAppContainer
 import com.bruno.itunessearch.domain.model.Song
 import com.bruno.itunessearch.ui.UiError
-import com.bruno.itunessearch.ui.components.CollapsingHeader
+import com.bruno.itunessearch.ui.components.StickySearchBar
 import com.bruno.itunessearch.ui.components.SongListItem
 import com.bruno.itunessearch.ui.toStringRes
 
-/**
- * Entry point for the Home screen.
- * Creates its own ViewModel via LocalAppContainer — NavHost stays thin.
- * Navigation is handled via callbacks (ViewModel doesn't know about navigation).
- */
 @Composable
 fun HomeScreen(
     onNavigateToPlayer: (trackId: Long) -> Unit,
@@ -61,7 +54,6 @@ fun HomeScreen(
         state = state,
         onEvent = viewModel::onEvent,
         onSongClick = { song ->
-            // Set playlist context: whatever list the user is looking at
             container.nowPlaying.setPlaylist(state.displayedSongs)
             onNavigateToPlayer(song.trackId)
         },
@@ -70,10 +62,6 @@ fun HomeScreen(
     )
 }
 
-/**
- * Stateless content composable — receives state, emits events.
- * Separated from HomeScreen for testability and @Preview support.
- */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun HomeContent(
@@ -83,14 +71,8 @@ private fun HomeContent(
     onMoreClick: (Song) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val listState = rememberLazyListState()
     val snackbarHostState = remember { SnackbarHostState() }
 
-    val collapsed by remember {
-        derivedStateOf { listState.firstVisibleItemIndex > 0 }
-    }
-
-    // Resolve error message in composable scope, then show as snackbar
     val errorMessage = state.error?.let { stringResource(it.toStringRes()) }
     LaunchedEffect(errorMessage) {
         if (errorMessage != null && state.displayedSongs.isNotEmpty()) {
@@ -112,15 +94,26 @@ private fun HomeContent(
                 .padding(padding),
         ) {
             LazyColumn(
-                state = listState,
-                contentPadding = PaddingValues(bottom = 16.dp),
+                contentPadding = PaddingValues(bottom = 80.dp),
                 modifier = Modifier.fillMaxSize(),
             ) {
-                headerSection(
-                    query = state.searchQuery,
-                    onQueryChange = { onEvent(HomeEvent.SearchQueryChanged(it)) },
-                    collapsed = collapsed,
-                )
+                // Title — scrolls away
+                item(key = "title") {
+                    Text(
+                        text = stringResource(R.string.songs_title),
+                        style = MaterialTheme.typography.headlineLarge,
+                        color = MaterialTheme.colorScheme.onBackground,
+                        modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
+                    )
+                }
+
+                // Search bar — sticks to top when title scrolls away
+                stickyHeader(key = "search") {
+                    StickySearchBar(
+                        query = state.searchQuery,
+                        onQueryChange = { onEvent(HomeEvent.SearchQueryChanged(it)) },
+                    )
+                }
 
                 if (state.isLoading) {
                     loadingSection()
@@ -148,22 +141,6 @@ private fun HomeContent(
 }
 
 // -- LazyList sections --
-
-private fun LazyListScope.headerSection(
-    query: String,
-    onQueryChange: (String) -> Unit,
-    collapsed: Boolean,
-) {
-    item(key = "header") {
-        Spacer(modifier = Modifier.height(8.dp))
-        CollapsingHeader(
-            query = query,
-            onQueryChange = onQueryChange,
-            collapsed = collapsed,
-        )
-        Spacer(modifier = Modifier.height(16.dp))
-    }
-}
 
 private fun LazyListScope.loadingSection() {
     item(key = "loading") {
