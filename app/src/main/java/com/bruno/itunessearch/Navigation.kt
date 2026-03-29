@@ -12,6 +12,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
 import com.bruno.itunessearch.ui.home.HomeScreen
+import com.bruno.itunessearch.ui.player.PlayerScreen
 import kotlinx.serialization.Serializable
 
 // Type-safe navigation routes
@@ -42,8 +43,11 @@ fun AppNavHost(modifier: Modifier = Modifier) {
 
         composable<PlayerRoute> { backStackEntry ->
             val route = backStackEntry.toRoute<PlayerRoute>()
-            // TODO: Batch 3 — PlayerScreen
-            PlaceholderScreen("Player: ${route.trackId}")
+            PlayerScreen(
+                trackId = route.trackId,
+                onBack = { navController.popBackStack() },
+                onMoreClick = { /* TODO: Batch 4 — bottom sheet */ },
+            )
         }
 
         composable<AlbumRoute> { backStackEntry ->

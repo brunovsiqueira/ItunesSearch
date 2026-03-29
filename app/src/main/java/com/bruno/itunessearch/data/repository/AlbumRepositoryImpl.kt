@@ -28,7 +28,7 @@ class AlbumRepositoryImpl(
         songDao.getByAlbum(collectionId).map { entities -> entities.map { it.toSong() } }
 
     override suspend fun fetchAlbumTracks(collectionId: Long): Result<Unit> =
-        safeApiCall {
+        safeApiCall(tag = TAG) {
             val response = api.lookupAlbumTracks(collectionId)
             val tracks = response.results
             // First result is the collection itself (wrapperType == "collection"), rest are tracks
@@ -37,4 +37,8 @@ class AlbumRepositoryImpl(
             val songEntities = tracks.mapNotNull { it.toSongEntity() }
             songDao.insertAll(songEntities)
         }
+
+    companion object {
+        private const val TAG = "AlbumRepository"
+    }
 }

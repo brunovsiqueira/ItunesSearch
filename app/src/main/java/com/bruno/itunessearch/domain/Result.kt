@@ -20,14 +20,18 @@ sealed interface Result<out T> {
 /**
  * Wraps a suspend block in try/catch and maps exceptions to Result.Failure.
  * Used in repository implementations to guarantee no exception leaks.
+ * All failures are logged for debugging.
  */
-suspend fun <T> safeApiCall(block: suspend () -> T): Result<T> =
+suspend fun <T> safeApiCall(tag: String = "API", block: suspend () -> T): Result<T> =
     try {
         Result.Success(block())
-    } catch (_: IOException) {
+    } catch (e: IOException) {
+        AppLogger.error(tag, "Network error", e)
         Result.Failure.Network
     } catch (e: HttpException) {
+        AppLogger.error(tag, "API error: ${e.code()} ${e.message()}", e)
         Result.Failure.Api(e.code(), e.message())
-    } catch (_: Exception) {
+    } catch (e: Exception) {
+        AppLogger.error(tag, "Unexpected error", e)
         Result.Failure.Unknown
     }

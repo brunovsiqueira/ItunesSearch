@@ -17,6 +17,8 @@ import retrofit2.Retrofit
 
 class AppContainer(context: Context) {
 
+    val applicationContext: Context = context.applicationContext
+
     // Network
     private val json = Json { ignoreUnknownKeys = true }
 

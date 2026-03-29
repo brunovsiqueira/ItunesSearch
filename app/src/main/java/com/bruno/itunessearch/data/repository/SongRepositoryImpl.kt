@@ -23,7 +23,7 @@ class SongRepositoryImpl(
         songDao.getBySearchQuery(query).map { entities -> entities.map { it.toSong() } }
 
     override suspend fun fetchSearchResults(query: String): Result<Unit> =
-        safeApiCall {
+        safeApiCall(tag = TAG) {
             val response = api.searchSongs(term = query)
             val entities = response.results.mapNotNull { it.toSongEntity(searchQuery = query) }
             songDao.clearByQuery(query)
@@ -38,5 +38,9 @@ class SongRepositoryImpl(
 
     override suspend fun markAsPlayed(trackId: Long) {
         songDao.updateLastPlayed(trackId)
+    }
+
+    companion object {
+        private const val TAG = "SongRepository"
     }
 }
