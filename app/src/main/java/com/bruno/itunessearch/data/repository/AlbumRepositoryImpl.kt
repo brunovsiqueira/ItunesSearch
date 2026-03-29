@@ -35,7 +35,7 @@ class AlbumRepositoryImpl(
             val albumDto = tracks.firstOrNull { it.wrapperType == "collection" }
             albumDto?.toAlbumEntity()?.let { albumDao.insert(it) }
             val songEntities = tracks.mapNotNull { it.toSongEntity() }
-            songDao.insertAll(songEntities)
+            songDao.insertIfNotExists(songEntities)
         }
 
     companion object {

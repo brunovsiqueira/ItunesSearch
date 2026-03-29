@@ -1,6 +1,7 @@
 package com.bruno.itunessearch.domain
 
 import java.io.IOException
+import kotlin.coroutines.cancellation.CancellationException
 import retrofit2.HttpException
 
 /**
@@ -20,11 +21,16 @@ sealed interface Result<out T> {
 /**
  * Wraps a suspend block in try/catch and maps exceptions to Result.Failure.
  * Used in repository implementations to guarantee no exception leaks.
- * All failures are logged for debugging.
+ *
+ * IMPORTANT: CancellationException is rethrown to preserve structured concurrency.
+ * Catching it would prevent coroutine cancellation from propagating correctly
+ * (e.g., when collectLatest cancels a previous collection).
  */
 suspend fun <T> safeApiCall(tag: String = "API", block: suspend () -> T): Result<T> =
     try {
         Result.Success(block())
+    } catch (e: CancellationException) {
+        throw e
     } catch (e: IOException) {
         AppLogger.error(tag, "Network error", e)
         Result.Failure.Network
