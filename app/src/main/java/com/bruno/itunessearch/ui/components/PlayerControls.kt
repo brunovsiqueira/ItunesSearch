@@ -17,12 +17,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.bruno.itunessearch.R
 import com.bruno.itunessearch.ui.theme.GrayButton
+import com.bruno.itunessearch.ui.theme.White
 
 @Composable
 fun PlayerControls(
@@ -66,7 +66,7 @@ fun PlayerControls(
             Icon(
                 painter = painterResource(R.drawable.ic_skip_previous),
                 contentDescription = stringResource(R.string.previous_track),
-                tint = Color.White.copy(alpha = if (hasPrevious) 1f else 0.4f),
+                tint = White.copy(alpha = if (hasPrevious) 1f else 0.4f),
                 modifier = Modifier.size(36.dp),
             )
         }
@@ -79,7 +79,7 @@ fun PlayerControls(
             Icon(
                 painter = painterResource(R.drawable.ic_skip_next),
                 contentDescription = stringResource(R.string.next_track),
-                tint = Color.White.copy(alpha = if (hasNext) 1f else 0.4f),
+                tint = White.copy(alpha = if (hasNext) 1f else 0.4f),
                 modifier = Modifier.size(36.dp),
             )
         }
@@ -90,7 +90,7 @@ fun PlayerControls(
         Icon(
             painter = painterResource(R.drawable.ic_repeat),
             contentDescription = stringResource(R.string.repeat),
-            tint = Color.White,
+            tint = White,
             modifier = Modifier.size(22.dp),
         )
     }

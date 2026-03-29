@@ -22,16 +22,14 @@ import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.bruno.itunessearch.R
 import com.bruno.itunessearch.domain.model.Song
-
-// Figma specifies #262626 at 80% with blur 50.
-// Since Compose blur requires API 31+, we use higher opacity as fallback for clean look.
-private val SheetBackground = Color(0xF2262626)
+import com.bruno.itunessearch.ui.theme.SheetBackground
+import com.bruno.itunessearch.ui.theme.SheetScrim
+import com.bruno.itunessearch.ui.theme.White
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -48,7 +46,7 @@ fun SongBottomSheet(
         sheetState = sheetState,
         containerColor = SheetBackground,
         shape = RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp),
-        scrimColor = Color.Black.copy(alpha = 0.5f),
+        scrimColor = SheetScrim,
         modifier = modifier,
     ) {
         Column(
@@ -62,7 +60,7 @@ fun SongBottomSheet(
             Text(
                 text = song.trackName,
                 style = MaterialTheme.typography.titleMedium,
-                color = Color.White,
+                color = White,
                 textAlign = TextAlign.Center,
                 modifier = Modifier.padding(horizontal = 24.dp),
             )
@@ -88,14 +86,14 @@ fun SongBottomSheet(
                 Icon(
                     imageVector = Icons.Default.Album,
                     contentDescription = null,
-                    tint = Color.White,
+                    tint = White,
                     modifier = Modifier.size(24.dp),
                 )
                 Spacer(modifier = Modifier.width(16.dp))
                 Text(
                     text = stringResource(R.string.view_album),
                     style = MaterialTheme.typography.bodyLarge,
-                    color = Color.White,
+                    color = White,
                 )
             }
         }

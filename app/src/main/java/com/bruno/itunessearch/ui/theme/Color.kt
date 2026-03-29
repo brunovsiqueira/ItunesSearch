@@ -19,3 +19,12 @@ val GrayButtonBorder = Color(0xFF48484A)
 // Seek bar
 val SeekBarTrack = Color(0xFF48484A)
 val SeekBarProgress = Color(0xFFD1D1D6)
+
+// Bottom sheet — #262626 at ~95% opacity (Figma: 80% + blur 50, higher opacity compensates for no blur)
+val SheetBackground = Color(0xF2262626)
+val SheetScrim = Color(0x80000000)
+
+// Splash
+val SplashGradientCenter = Color(0xFF1A3A3A)
+val SplashGradientMid = Color(0xFF0A1A1A)
+val SplashIconTint = Color(0xFF8A9A9A)
