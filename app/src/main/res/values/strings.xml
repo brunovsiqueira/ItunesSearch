@@ -37,4 +37,5 @@
     <string name="cd_back">Go back</string>
     <string name="cd_search">Search</string>
     <string name="cd_clear_search">Clear search</string>
+    <string name="cd_remove_from_recent">Remove from recently played</string>
 </resources>

@@ -136,9 +136,11 @@ private fun PlayerContent(
                 isPlaying = state.isPlaying,
                 hasPrevious = state.hasPrevious,
                 hasNext = state.hasNext,
+                isRepeatEnabled = state.isRepeatEnabled,
                 onPlayPause = { onEvent(PlayerEvent.PlayPause) },
                 onPrevious = { onEvent(PlayerEvent.Previous) },
                 onNext = { onEvent(PlayerEvent.Next) },
+                onToggleRepeat = { onEvent(PlayerEvent.ToggleRepeat) },
             )
 
             Spacer(modifier = Modifier.height(32.dp))

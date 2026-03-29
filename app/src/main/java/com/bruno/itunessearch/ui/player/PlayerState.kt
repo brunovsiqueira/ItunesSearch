@@ -11,6 +11,7 @@ data class PlayerState(
     val positionMs: Long = 0L,
     val durationMs: Long = 0L,
     val playlist: List<Song> = emptyList(),
+    val isRepeatEnabled: Boolean = false,
     val error: UiError? = null,
 ) {
     val hasPrevious: Boolean
@@ -31,5 +32,6 @@ sealed interface PlayerEvent {
     data object Next : PlayerEvent
     data object Previous : PlayerEvent
     data class SeekTo(val positionMs: Long) : PlayerEvent
+    data object ToggleRepeat : PlayerEvent
     data object ErrorDismissed : PlayerEvent
 }

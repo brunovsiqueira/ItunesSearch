@@ -36,6 +36,9 @@ interface SongDao {
     @Query("UPDATE songs SET lastPlayedAt = :timestamp WHERE trackId = :trackId")
     suspend fun updateLastPlayed(trackId: Long, timestamp: Long = System.currentTimeMillis())
 
+    @Query("UPDATE songs SET lastPlayedAt = NULL WHERE trackId = :trackId")
+    suspend fun clearLastPlayed(trackId: Long)
+
     @Query("DELETE FROM songs WHERE searchQuery = :query")
     suspend fun clearByQuery(query: String)
 }

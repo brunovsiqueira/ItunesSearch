@@ -38,4 +38,8 @@ class FakeSongRepository : SongRepository {
     override suspend fun markAsPlayed(trackId: Long) {
         playedTrackIds.add(trackId)
     }
+
+    override suspend fun removeFromRecentlyPlayed(trackId: Long) {
+        recentlyPlayed.value = recentlyPlayed.value.filter { it.trackId != trackId }
+    }
 }

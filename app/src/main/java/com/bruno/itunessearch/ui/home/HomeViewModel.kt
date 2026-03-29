@@ -41,6 +41,7 @@ class HomeViewModel(
             is HomeEvent.PullToRefresh -> refresh()
             is HomeEvent.Retry -> retry()
             is HomeEvent.ErrorDismissed -> _state.update { it.copy(error = null) }
+            is HomeEvent.DismissSong -> dismissSong(event.trackId)
         }
     }
 
@@ -97,6 +98,10 @@ class HomeViewModel(
             songRepository.fetchSearchResults(query)
             _state.update { it.copy(isRefreshing = false) }
         }
+    }
+
+    private fun dismissSong(trackId: Long) {
+        viewModelScope.launch { songRepository.removeFromRecentlyPlayed(trackId) }
     }
 
     private fun retry() {

@@ -35,6 +35,7 @@ class PlayerViewModel(
             is PlayerEvent.Next -> skipNext()
             is PlayerEvent.Previous -> skipPrevious()
             is PlayerEvent.SeekTo -> audioPlayer.seekTo(event.positionMs)
+            is PlayerEvent.ToggleRepeat -> audioPlayer.toggleRepeat()
             is PlayerEvent.ErrorDismissed -> {
                 _state.update { it.copy(error = null) }
                 audioPlayer.clearError()
@@ -84,6 +85,11 @@ class PlayerViewModel(
         viewModelScope.launch {
             audioPlayer.positionFlow.collectLatest { position ->
                 _state.update { it.copy(positionMs = position) }
+            }
+        }
+        viewModelScope.launch {
+            audioPlayer.isRepeatEnabled.collectLatest { repeat ->
+                _state.update { it.copy(isRepeatEnabled = repeat) }
             }
         }
         viewModelScope.launch {

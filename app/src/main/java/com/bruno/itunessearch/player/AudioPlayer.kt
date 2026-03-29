@@ -31,12 +31,14 @@ interface AudioPlayer {
     val isPlaying: StateFlow<Boolean>
     val duration: StateFlow<Long>
     val hasError: StateFlow<Boolean>
+    val isRepeatEnabled: StateFlow<Boolean>
     val positionFlow: Flow<Long>
 
     fun play(url: String)
     fun resume()
     fun pause()
     fun seekTo(positionMs: Long)
+    fun toggleRepeat()
     fun release()
     fun clearError()
 }
@@ -66,6 +68,9 @@ class ExoAudioPlayer(context: Context) : AudioPlayer {
 
     private val _hasError = MutableStateFlow(false)
     override val hasError: StateFlow<Boolean> = _hasError.asStateFlow()
+
+    private val _isRepeatEnabled = MutableStateFlow(false)
+    override val isRepeatEnabled: StateFlow<Boolean> = _isRepeatEnabled.asStateFlow()
 
     override val positionFlow: Flow<Long> = flow {
         while (true) {
@@ -119,6 +124,12 @@ class ExoAudioPlayer(context: Context) : AudioPlayer {
     override fun seekTo(positionMs: Long) {
         runCatching { exoPlayer.seekTo(positionMs) }
             .onFailure { e -> AppLogger.error(TAG, "Failed to seek", e) }
+    }
+
+    override fun toggleRepeat() {
+        val newValue = !_isRepeatEnabled.value
+        _isRepeatEnabled.update { newValue }
+        exoPlayer.repeatMode = if (newValue) Player.REPEAT_MODE_ONE else Player.REPEAT_MODE_OFF
     }
 
     override fun release() {

@@ -17,6 +17,9 @@ class FakeAudioPlayer : AudioPlayer {
     private val _hasError = MutableStateFlow(false)
     override val hasError: StateFlow<Boolean> = _hasError.asStateFlow()
 
+    private val _isRepeatEnabled = MutableStateFlow(false)
+    override val isRepeatEnabled: StateFlow<Boolean> = _isRepeatEnabled.asStateFlow()
+
     override val positionFlow: Flow<Long> = flowOf(0L)
 
     var lastPlayedUrl: String? = null
@@ -39,6 +42,10 @@ class FakeAudioPlayer : AudioPlayer {
     }
 
     override fun seekTo(positionMs: Long) {}
+
+    override fun toggleRepeat() {
+        _isRepeatEnabled.value = !_isRepeatEnabled.value
+    }
 
     override fun release() {}
 

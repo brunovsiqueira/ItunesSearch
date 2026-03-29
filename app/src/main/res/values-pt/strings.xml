@@ -37,4 +37,5 @@
     <string name="cd_back">Voltar</string>
     <string name="cd_search">Buscar</string>
     <string name="cd_clear_search">Limpar busca</string>
+    <string name="cd_remove_from_recent">Remover das reproduzidas recentemente</string>
 </resources>

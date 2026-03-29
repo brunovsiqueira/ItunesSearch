@@ -49,4 +49,5 @@ sealed interface HomeEvent {
     data object PullToRefresh : HomeEvent
     data object Retry : HomeEvent
     data object ErrorDismissed : HomeEvent
+    data class DismissSong(val trackId: Long) : HomeEvent
 }

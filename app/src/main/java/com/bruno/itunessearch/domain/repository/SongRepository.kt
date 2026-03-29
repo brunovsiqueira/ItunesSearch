@@ -17,4 +17,6 @@ interface SongRepository {
     fun getSongsByAlbumStream(collectionId: Long): Flow<List<Song>>
 
     suspend fun markAsPlayed(trackId: Long)
+
+    suspend fun removeFromRecentlyPlayed(trackId: Long)
 }

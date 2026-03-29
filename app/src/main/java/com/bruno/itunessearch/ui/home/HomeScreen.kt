@@ -145,6 +145,9 @@ private fun HomeContent(
                     songs = state.displayedSongs,
                     onSongClick = onSongClick,
                     onMoreClick = onMoreClick,
+                    onDismiss = if (state.isShowingRecentlyPlayed) {
+                        { song -> onEvent(HomeEvent.DismissSong(song.trackId)) }
+                    } else null,
                 )
             }
         }
@@ -218,6 +221,7 @@ private fun LazyListScope.songListSection(
     songs: List<Song>,
     onSongClick: (Song) -> Unit,
     onMoreClick: (Song) -> Unit,
+    onDismiss: ((Song) -> Unit)?,
 ) {
     items(
         items = songs,
@@ -227,6 +231,7 @@ private fun LazyListScope.songListSection(
             song = song,
             onSongClick = { onSongClick(song) },
             onMoreClick = { onMoreClick(song) },
+            onDismiss = onDismiss?.let { { it(song) } },
         )
     }
 }

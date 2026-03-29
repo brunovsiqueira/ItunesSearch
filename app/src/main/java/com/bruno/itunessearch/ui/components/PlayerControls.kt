@@ -29,9 +29,11 @@ fun PlayerControls(
     isPlaying: Boolean,
     hasPrevious: Boolean,
     hasNext: Boolean,
+    isRepeatEnabled: Boolean,
     onPlayPause: () -> Unit,
     onPrevious: () -> Unit,
     onNext: () -> Unit,
+    onToggleRepeat: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Row(
@@ -87,11 +89,13 @@ fun PlayerControls(
         Spacer(modifier = Modifier.weight(1f))
 
         // Repeat — custom Figma icon (22dp per design)
-        Icon(
-            painter = painterResource(R.drawable.ic_repeat),
-            contentDescription = stringResource(R.string.repeat),
-            tint = White,
-            modifier = Modifier.size(22.dp),
-        )
+        IconButton(onClick = onToggleRepeat) {
+            Icon(
+                painter = painterResource(R.drawable.ic_repeat),
+                contentDescription = stringResource(R.string.repeat),
+                tint = if (isRepeatEnabled) White else White.copy(alpha = 0.4f),
+                modifier = Modifier.size(22.dp),
+            )
+        }
     }
 }

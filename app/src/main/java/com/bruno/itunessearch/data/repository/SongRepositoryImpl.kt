@@ -40,6 +40,10 @@ class SongRepositoryImpl(
         songDao.updateLastPlayed(trackId)
     }
 
+    override suspend fun removeFromRecentlyPlayed(trackId: Long) {
+        songDao.clearLastPlayed(trackId)
+    }
+
     companion object {
         private const val TAG = "SongRepository"
     }

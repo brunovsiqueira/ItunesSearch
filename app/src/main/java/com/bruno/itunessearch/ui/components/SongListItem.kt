@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.MoreHoriz
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -30,9 +31,10 @@ import com.bruno.itunessearch.domain.model.Song
 @Composable
 fun SongListItem(
     song: Song,
+    modifier: Modifier = Modifier,
     onSongClick: () -> Unit,
     onMoreClick: (() -> Unit)? = null,
-    modifier: Modifier = Modifier,
+    onDismiss: (() -> Unit)? = null,
 ) {
     Row(
         modifier = modifier
@@ -67,6 +69,17 @@ fun SongListItem(
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
             )
+        }
+
+        if (onDismiss != null) {
+            IconButton(onClick = onDismiss) {
+                Icon(
+                    imageVector = Icons.Default.Close,
+                    contentDescription = stringResource(R.string.cd_remove_from_recent),
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.size(18.dp),
+                )
+            }
         }
 
         if (onMoreClick != null) {
