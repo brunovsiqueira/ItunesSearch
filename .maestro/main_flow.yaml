@@ -1,0 +1,51 @@
+appId: com.bruno.itunessearch
+---
+# Main flow: Launch → Home → Search → Play Song → Back → Verify state
+
+# Launch app and wait for splash
+- launchApp
+- extendedWaitUntil:
+    visible: "Songs"
+    timeout: 5000
+
+# Verify home screen
+- assertVisible: "Songs"
+
+# Search for a song
+- tapOn: "Search"
+- inputText: "Daft Punk"
+- hideKeyboard
+- extendedWaitUntil:
+    visible: "Aerodynamic"
+    timeout: 15000
+
+# Verify search results loaded
+- assertVisible: "Aerodynamic"
+- assertVisible: "Daft Punk"
+
+# Tap on a song to open player
+- tapOn:
+    text: "Aerodynamic"
+    index: 0
+- extendedWaitUntil:
+    visible: "Now playing"
+    timeout: 5000
+
+# Verify player screen
+- assertVisible: "Now playing"
+
+# Go back to home
+- pressKey: back
+- extendedWaitUntil:
+    visible: "Songs"
+    timeout: 5000
+
+# Verify search results still visible (state preserved after navigation)
+- assertVisible: "Aerodynamic"
+
+# Clear search to show recently played
+- tapOn: "Clear search"
+- waitForAnimationToEnd
+
+# Aerodynamic should now be in recently played (we just played it)
+- assertVisible: "Aerodynamic"
