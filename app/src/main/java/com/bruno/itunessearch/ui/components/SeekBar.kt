@@ -4,6 +4,9 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Slider
 import androidx.compose.material3.SliderDefaults
@@ -16,10 +19,14 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.foundation.layout.size
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.unit.dp
 import com.bruno.itunessearch.ui.theme.SeekBarProgress
 import com.bruno.itunessearch.ui.theme.SeekBarTrack
 import java.util.Locale
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SeekBar(
     positionMs: Long,
@@ -57,6 +64,16 @@ fun SeekBar(
                 activeTrackColor = SeekBarProgress,
                 inactiveTrackColor = SeekBarTrack,
             ),
+            thumb = {
+                // Small circle thumb matching Figma (default is too large)
+                Canvas(
+                    modifier = Modifier
+                        .size(12.dp)
+                        .clip(CircleShape),
+                ) {
+                    drawCircle(color = SeekBarProgress)
+                }
+            },
             modifier = Modifier.fillMaxWidth(),
         )
 
