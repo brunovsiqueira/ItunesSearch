@@ -31,7 +31,7 @@ import com.bruno.itunessearch.domain.model.Song
 fun SongListItem(
     song: Song,
     onSongClick: () -> Unit,
-    onMoreClick: () -> Unit,
+    onMoreClick: (() -> Unit)? = null,
     modifier: Modifier = Modifier,
 ) {
     Row(
@@ -69,12 +69,14 @@ fun SongListItem(
             )
         }
 
-        IconButton(onClick = onMoreClick) {
-            Icon(
-                imageVector = Icons.Default.MoreHoriz,
-                contentDescription = stringResource(R.string.more_options),
-                tint = MaterialTheme.colorScheme.onSurfaceVariant,
-            )
+        if (onMoreClick != null) {
+            IconButton(onClick = onMoreClick) {
+                Icon(
+                    imageVector = Icons.Default.MoreHoriz,
+                    contentDescription = stringResource(R.string.more_options),
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            }
         }
     }
 }

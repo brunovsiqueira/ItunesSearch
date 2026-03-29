@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.lazy.LazyColumn
@@ -71,7 +72,8 @@ private fun AlbumContent(
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
-                .statusBarsPadding(),
+                .statusBarsPadding()
+                .navigationBarsPadding(),
             contentPadding = PaddingValues(bottom = 32.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
@@ -150,7 +152,6 @@ private fun AlbumContent(
                 SongListItem(
                     song = song,
                     onSongClick = { onTrackClick(song.trackId) },
-                    onMoreClick = { /* no "..." on album tracks per Figma */ },
                 )
             }
         }
