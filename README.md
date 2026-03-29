@@ -2,7 +2,9 @@
 
 An Android app for searching and playing song previews via the Apple iTunes API, built with Jetpack Compose.
 
-> **Demo video:** [TODO: Add demo recording here]
+https://github.com/user-attachments/assets/787be746-e31d-450f-8f96-a96d72fd0b6c
+
+
 
 ## Features
 
