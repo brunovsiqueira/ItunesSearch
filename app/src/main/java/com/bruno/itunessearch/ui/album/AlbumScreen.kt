@@ -26,6 +26,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.bruno.itunessearch.di.LocalAppContainer
 import com.bruno.itunessearch.ui.components.AlbumArtwork
+import com.bruno.itunessearch.ui.components.ErrorState
 import com.bruno.itunessearch.ui.components.ScreenTopBar
 import com.bruno.itunessearch.ui.components.SongListItem
 
@@ -47,6 +48,7 @@ fun AlbumScreen(
 
     AlbumContent(
         state = state,
+        onEvent = viewModel::onEvent,
         onBack = onBack,
         onTrackClick = { trackId ->
             container.nowPlaying.setPlaylist(state.tracks)
@@ -59,6 +61,7 @@ fun AlbumScreen(
 @Composable
 private fun AlbumContent(
     state: AlbumState,
+    onEvent: (AlbumEvent) -> Unit,
     onBack: () -> Unit,
     onTrackClick: (trackId: Long) -> Unit,
     modifier: Modifier = Modifier,
@@ -130,6 +133,16 @@ private fun AlbumContent(
                             color = MaterialTheme.colorScheme.onSurface,
                         )
                     }
+                }
+            }
+
+            // Error with retry
+            if (state.error != null && state.tracks.isEmpty()) {
+                item(key = "error") {
+                    ErrorState(
+                        error = state.error,
+                        onRetry = { onEvent(AlbumEvent.Retry) },
+                    )
                 }
             }
 

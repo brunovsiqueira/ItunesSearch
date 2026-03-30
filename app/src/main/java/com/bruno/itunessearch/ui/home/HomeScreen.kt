@@ -1,12 +1,9 @@
 package com.bruno.itunessearch.ui.home
 
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
@@ -18,7 +15,6 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
 import androidx.activity.compose.BackHandler
@@ -37,6 +33,7 @@ import com.bruno.itunessearch.R
 import com.bruno.itunessearch.di.LocalAppContainer
 import com.bruno.itunessearch.domain.model.Song
 import com.bruno.itunessearch.ui.UiError
+import com.bruno.itunessearch.ui.components.ErrorState
 import com.bruno.itunessearch.ui.components.StickySearchBar
 import com.bruno.itunessearch.ui.components.SongListItem
 import com.bruno.itunessearch.ui.toStringRes
@@ -176,25 +173,7 @@ private fun LazyListScope.errorSection(
     onRetry: () -> Unit,
 ) {
     item(key = "error") {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(32.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-        ) {
-            Text(
-                text = stringResource(error.toStringRes()),
-                style = MaterialTheme.typography.bodyLarge,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-            )
-            Spacer(modifier = Modifier.height(8.dp))
-            TextButton(onClick = onRetry) {
-                Text(
-                    text = stringResource(R.string.retry),
-                    color = MaterialTheme.colorScheme.onSurface,
-                )
-            }
-        }
+        ErrorState(error = error, onRetry = onRetry)
     }
 }
 
