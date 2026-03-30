@@ -10,8 +10,6 @@ val DarkSurfaceVariant = Color(0xFF2C2C2E)
 // Text
 val White = Color(0xFFFFFFFF)
 val GrayText = Color(0xFF8E8E93)
-val LightGrayText = Color(0xFFAEAEB2)
-
 // Accent
 val GrayButton = Color(0xFF3A3A3C)
 val GrayButtonBorder = Color(0xFF48484A)
@@ -27,4 +25,3 @@ val SheetScrim = Color(0x80000000)
 // Splash
 val SplashGradientCenter = Color(0xFF1A3A3A)
 val SplashGradientMid = Color(0xFF0A1A1A)
-val SplashIconTint = Color(0xFF8A9A9A)

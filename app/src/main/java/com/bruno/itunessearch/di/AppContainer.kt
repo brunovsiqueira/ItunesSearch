@@ -55,7 +55,10 @@ class AppContainer(context: Context) {
         context.applicationContext,
         AppDatabase::class.java,
         AppDatabase.NAME,
-    ).build()
+    )
+        .addMigrations(AppDatabase.MIGRATION_1_2)
+        .fallbackToDestructiveMigration() // safe — only cached data, no user-created data
+        .build()
 
     // Repositories
     val songRepository: SongRepository = SongRepositoryImpl(
