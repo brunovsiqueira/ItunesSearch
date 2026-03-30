@@ -1,9 +1,17 @@
 package com.bruno.itunessearch.data.local.entity
 
 import androidx.room.Entity
+import androidx.room.Index
 import androidx.room.PrimaryKey
 
-@Entity(tableName = "songs")
+@Entity(
+    tableName = "songs",
+    indices = [
+        Index("collectionId"),
+        Index("searchQuery"),
+        Index("lastPlayedAt"),
+    ],
+)
 data class SongEntity(
     @PrimaryKey val trackId: Long,
     val trackName: String,
