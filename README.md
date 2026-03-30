@@ -54,7 +54,7 @@ UI (Compose) <──state── ViewModel <──flow── Repository <──wr
 | Testing | Fakes over mocks | Readable, no reflection magic. Google-recommended. |
 | Navigation | Compose Navigation (type-safe) | Supports shared element transitions, ecosystem standard. |
 
-Full decision log with alternatives and trade-offs: [`docs/DECISIONS.md`](docs/DECISIONS.md)
+Full decision log with context, alternatives, and trade-offs: [`adr/`](adr/)
 
 ### Offline-First Strategy
 
