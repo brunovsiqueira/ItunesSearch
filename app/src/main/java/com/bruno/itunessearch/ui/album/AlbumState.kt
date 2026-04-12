@@ -16,4 +16,5 @@ data class AlbumState(
 sealed interface AlbumEvent {
     data object Retry : AlbumEvent
     data object ErrorDismissed : AlbumEvent
+    data class TrackClicked(val song: Song) : AlbumEvent
 }

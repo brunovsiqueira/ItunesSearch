@@ -42,6 +42,7 @@ fun AlbumScreen(
         AlbumViewModel(
             collectionId = collectionId,
             albumRepository = container.albumRepository,
+            nowPlaying = container.nowPlaying,
         )
     }
     val state by viewModel.state.collectAsStateWithLifecycle()
@@ -50,9 +51,9 @@ fun AlbumScreen(
         state = state,
         onEvent = viewModel::onEvent,
         onBack = onBack,
-        onTrackClick = { trackId ->
-            container.nowPlaying.setPlaylist(state.tracks)
-            onTrackClick(trackId)
+        onTrackClick = { song ->
+            viewModel.onEvent(AlbumEvent.TrackClicked(song))
+            onTrackClick(song.trackId)
         },
         modifier = modifier,
     )
@@ -63,7 +64,7 @@ private fun AlbumContent(
     state: AlbumState,
     onEvent: (AlbumEvent) -> Unit,
     onBack: () -> Unit,
-    onTrackClick: (trackId: Long) -> Unit,
+    onTrackClick: (com.bruno.itunessearch.domain.model.Song) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Surface(
@@ -78,7 +79,6 @@ private fun AlbumContent(
             contentPadding = PaddingValues(bottom = 80.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-            // Top bar: back + album title
             item(key = "topbar") {
                 ScreenTopBar(
                     title = state.album?.collectionName.orEmpty(),
@@ -86,7 +86,6 @@ private fun AlbumContent(
                 )
             }
 
-            // Album artwork + info
             item(key = "album_header") {
                 Column(
                     horizontalAlignment = Alignment.CenterHorizontally,
@@ -98,9 +97,7 @@ private fun AlbumContent(
                             albumName = album.collectionName,
                             size = 200.dp,
                         )
-
                         Spacer(modifier = Modifier.height(16.dp))
-
                         Text(
                             text = album.collectionName,
                             style = MaterialTheme.typography.titleLarge,
@@ -115,12 +112,10 @@ private fun AlbumContent(
                             textAlign = TextAlign.Center,
                         )
                     }
-
                     Spacer(modifier = Modifier.height(40.dp))
                 }
             }
 
-            // Loading
             if (state.isLoading && state.tracks.isEmpty()) {
                 item(key = "loading") {
                     Box(
@@ -129,14 +124,11 @@ private fun AlbumContent(
                             .padding(32.dp),
                         contentAlignment = Alignment.Center,
                     ) {
-                        CircularProgressIndicator(
-                            color = MaterialTheme.colorScheme.onSurface,
-                        )
+                        CircularProgressIndicator(color = MaterialTheme.colorScheme.onSurface)
                     }
                 }
             }
 
-            // Error with retry
             if (state.error != null && state.tracks.isEmpty()) {
                 item(key = "error") {
                     ErrorState(
@@ -146,14 +138,10 @@ private fun AlbumContent(
                 }
             }
 
-            // Track list
-            items(
-                items = state.tracks,
-                key = { it.trackId },
-            ) { song ->
+            items(items = state.tracks, key = { it.trackId }) { song ->
                 SongListItem(
                     song = song,
-                    onSongClick = { onTrackClick(song.trackId) },
+                    onSongClick = { onTrackClick(song) },
                 )
             }
         }

@@ -11,6 +11,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
@@ -27,6 +28,7 @@ class PlayerViewModel(
     init {
         loadSong()
         observePlaybackState()
+        observePlaylist()
     }
 
     fun onEvent(event: PlayerEvent) {
@@ -45,11 +47,16 @@ class PlayerViewModel(
 
     private fun loadSong() {
         viewModelScope.launch {
-            val song = songRepository.getSongById(trackId) ?: return@launch
+            val song = songRepository.getSongById(trackId)
+            if (song == null) {
+                _state.update { it.copy(error = UiError.Unknown) }
+                return@launch
+            }
+
             _state.update { it.copy(currentSong = song) }
             songRepository.markAsPlayed(trackId)
 
-            // If this song is already the current one, just sync state — don't restart playback
+            // If this song is already playing, sync state without restarting
             if (nowPlaying.currentSong.value?.trackId == trackId) {
                 nowPlaying.setSong(song)
                 return@launch
@@ -62,8 +69,9 @@ class PlayerViewModel(
                 _state.update { it.copy(error = UiError.NoPreview) }
             }
         }
+    }
 
-        // Playlist comes from the launching screen (Home or Album) via NowPlayingState
+    private fun observePlaylist() {
         viewModelScope.launch {
             nowPlaying.playlist.collectLatest { playlist ->
                 _state.update { it.copy(playlist = playlist) }
@@ -71,49 +79,49 @@ class PlayerViewModel(
         }
     }
 
+    /**
+     * Combines all AudioPlayer reactive state into a single observation.
+     * Position is observed separately since it emits at high frequency (200ms).
+     */
     private fun observePlaybackState() {
+        // Combine discrete state changes
         viewModelScope.launch {
-            audioPlayer.isPlaying.collectLatest { playing ->
-                _state.update { it.copy(isPlaying = playing) }
+            combine(
+                audioPlayer.isPlaying,
+                audioPlayer.duration,
+                audioPlayer.isRepeatEnabled,
+                audioPlayer.hasError,
+            ) { isPlaying, duration, repeatEnabled, hasError ->
+                PlaybackUpdate(isPlaying, duration, repeatEnabled, hasError)
+            }.collectLatest { update ->
+                _state.update {
+                    it.copy(
+                        isPlaying = update.isPlaying,
+                        durationMs = update.duration,
+                        isRepeatEnabled = update.repeatEnabled,
+                        error = if (update.hasError) UiError.Network else it.error,
+                    )
+                }
             }
         }
-        viewModelScope.launch {
-            audioPlayer.duration.collectLatest { duration ->
-                _state.update { it.copy(durationMs = duration) }
-            }
-        }
+
+        // Position updates at high frequency — separate to avoid unnecessary combine emissions
         viewModelScope.launch {
             audioPlayer.positionFlow.collectLatest { position ->
                 _state.update { it.copy(positionMs = position) }
             }
         }
-        viewModelScope.launch {
-            audioPlayer.isRepeatEnabled.collectLatest { repeat ->
-                _state.update { it.copy(isRepeatEnabled = repeat) }
-            }
-        }
-        viewModelScope.launch {
-            audioPlayer.hasError.collectLatest { hasError ->
-                if (hasError) {
-                    _state.update { it.copy(error = UiError.Network) }
-                }
-            }
-        }
     }
 
     private fun togglePlayPause() {
-        if (_state.value.isPlaying) {
-            audioPlayer.pause()
-        } else {
-            audioPlayer.resume()
-        }
+        if (_state.value.isPlaying) audioPlayer.pause() else audioPlayer.resume()
     }
 
     private fun skipNext() {
         val current = _state.value.currentSong ?: return
         val playlist = _state.value.playlist
         val index = playlist.indexOfFirst { it.trackId == current.trackId }
-        if (index < playlist.lastIndex) {
+        if (index in 0 until playlist.lastIndex) {
             playSong(playlist[index + 1])
         }
     }
@@ -134,3 +142,10 @@ class PlayerViewModel(
         song.previewUrl?.let { audioPlayer.play(it) }
     }
 }
+
+private data class PlaybackUpdate(
+    val isPlaying: Boolean,
+    val duration: Long,
+    val repeatEnabled: Boolean,
+    val hasError: Boolean,
+)

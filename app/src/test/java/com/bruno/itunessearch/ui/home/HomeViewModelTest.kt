@@ -5,6 +5,7 @@ import com.bruno.itunessearch.domain.Result
 import com.bruno.itunessearch.fakes.FakeSongRepository
 import com.bruno.itunessearch.fakes.NoOpLogWriter
 import com.bruno.itunessearch.fakes.TestData
+import com.bruno.itunessearch.player.NowPlayingState
 import com.bruno.itunessearch.ui.UiError
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -26,6 +27,7 @@ class HomeViewModelTest {
 
     private val testDispatcher = StandardTestDispatcher()
     private lateinit var repository: FakeSongRepository
+    private lateinit var nowPlaying: NowPlayingState
     private lateinit var viewModel: HomeViewModel
 
     @Before
@@ -33,7 +35,8 @@ class HomeViewModelTest {
         Dispatchers.setMain(testDispatcher)
         AppLogger.writer = NoOpLogWriter()
         repository = FakeSongRepository()
-        viewModel = HomeViewModel(repository)
+        nowPlaying = NowPlayingState()
+        viewModel = HomeViewModel(repository, nowPlaying)
         testDispatcher.scheduler.advanceUntilIdle()
     }
 

@@ -3,7 +3,9 @@ package com.bruno.itunessearch.ui.home
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.bruno.itunessearch.domain.Result
+import com.bruno.itunessearch.domain.model.Song
 import com.bruno.itunessearch.domain.repository.SongRepository
+import com.bruno.itunessearch.player.NowPlayingState
 import com.bruno.itunessearch.ui.toUiError
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -18,6 +20,7 @@ import kotlinx.coroutines.launch
 @OptIn(FlowPreview::class)
 class HomeViewModel(
     private val songRepository: SongRepository,
+    private val nowPlaying: NowPlayingState,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(HomeState())
@@ -36,13 +39,17 @@ class HomeViewModel(
                 _state.update { it.copy(searchQuery = event.query, hasSearched = false) }
                 searchQueryFlow.value = event.query
             }
-            is HomeEvent.SongClicked -> { /* handled by screen via navigation callback */ }
-            is HomeEvent.MoreClicked -> { /* handled by screen via bottom sheet callback */ }
+            is HomeEvent.SongClicked -> onSongClicked(event.song)
             is HomeEvent.PullToRefresh -> refresh()
             is HomeEvent.Retry -> retry()
             is HomeEvent.ErrorDismissed -> _state.update { it.copy(error = null) }
             is HomeEvent.DismissSong -> dismissSong(event.trackId)
         }
+    }
+
+    private fun onSongClicked(song: Song) {
+        // Set playlist context before navigation — ViewModel owns this responsibility
+        nowPlaying.setPlaylist(_state.value.displayedSongs)
     }
 
     private fun observeRecentlyPlayed() {
@@ -53,8 +60,11 @@ class HomeViewModel(
         }
     }
 
+    /**
+     * Single coroutine handles both API fetch and Room observation for the current query.
+     * collectLatest cancels the previous collection when query changes, preventing race conditions.
+     */
     private fun observeSearchQuery() {
-        // Trigger API fetch on query change (debounced)
         viewModelScope.launch {
             searchQueryFlow
                 .debounce(SEARCH_DEBOUNCE_MS)
@@ -64,17 +74,11 @@ class HomeViewModel(
                         _state.update { it.copy(searchResults = emptyList(), isLoading = false) }
                         return@collectLatest
                     }
-                    search(query)
-                }
-        }
 
-        // Observe search results from Room (reactive — auto-emits when Room is written to)
-        viewModelScope.launch {
-            searchQueryFlow
-                .debounce(SEARCH_DEBOUNCE_MS)
-                .distinctUntilChanged()
-                .collectLatest { query ->
-                    if (query.isBlank()) return@collectLatest
+                    // Fetch from API (writes to Room)
+                    search(query)
+
+                    // Then observe Room for reactive updates (e.g., if cache is populated)
                     songRepository.getSearchResultsStream(query).collectLatest { songs ->
                         _state.update { it.copy(searchResults = songs) }
                     }
@@ -86,7 +90,9 @@ class HomeViewModel(
         _state.update { it.copy(isLoading = true, error = null) }
         when (val result = songRepository.fetchSearchResults(query)) {
             is Result.Success -> _state.update { it.copy(isLoading = false, hasSearched = true) }
-            is Result.Failure -> _state.update { it.copy(isLoading = false, hasSearched = true, error = result.toUiError()) }
+            is Result.Failure -> _state.update {
+                it.copy(isLoading = false, hasSearched = true, error = result.toUiError())
+            }
         }
     }
 

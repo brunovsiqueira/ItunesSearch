@@ -3,7 +3,9 @@ package com.bruno.itunessearch.ui.album
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.bruno.itunessearch.domain.Result
+import com.bruno.itunessearch.domain.model.Song
 import com.bruno.itunessearch.domain.repository.AlbumRepository
+import com.bruno.itunessearch.player.NowPlayingState
 import com.bruno.itunessearch.ui.toUiError
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -15,6 +17,7 @@ import kotlinx.coroutines.launch
 class AlbumViewModel(
     private val collectionId: Long,
     private val albumRepository: AlbumRepository,
+    private val nowPlaying: NowPlayingState,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(AlbumState())
@@ -29,7 +32,12 @@ class AlbumViewModel(
         when (event) {
             is AlbumEvent.Retry -> fetchAlbum()
             is AlbumEvent.ErrorDismissed -> _state.update { it.copy(error = null) }
+            is AlbumEvent.TrackClicked -> onTrackClicked(event.song)
         }
+    }
+
+    private fun onTrackClicked(song: Song) {
+        nowPlaying.setPlaylist(_state.value.tracks)
     }
 
     private fun observeAlbum() {

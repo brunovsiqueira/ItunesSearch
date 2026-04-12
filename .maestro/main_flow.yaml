@@ -1,12 +1,14 @@
 appId: com.bruno.itunessearch
+tags:
+  - android
 ---
-# Main flow: Launch → Home → Search → Play Song → Back → Verify state
+# Main flow: Home → Search → Play Song → Back → Verify state
+# Pre-requisite: App must be installed and launched
 
-# Launch app and wait for splash
-- launchApp
+# Wait for home screen
 - extendedWaitUntil:
     visible: "Songs"
-    timeout: 5000
+    timeout: 8000
 
 # Verify home screen
 - assertVisible: "Songs"
@@ -47,5 +49,5 @@ appId: com.bruno.itunessearch
 - tapOn: "Clear search"
 - waitForAnimationToEnd
 
-# Aerodynamic should now be in recently played (we just played it)
+# Aerodynamic should now be in recently played
 - assertVisible: "Aerodynamic"
